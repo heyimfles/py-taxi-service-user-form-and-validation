@@ -1,10 +1,9 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from taxi.models import Driver, Car
+from taxi.models import Car
 
 
 class LicenseNumberValidationMixin(object):
@@ -48,8 +47,8 @@ class DriverLicenseUpdateForm(
 
 
 class CarCreateForm(forms.ModelForm):
+    User = get_user_model()
     drivers = forms.ModelMultipleChoiceField(
-        User = get_user_model(),
         queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=False
