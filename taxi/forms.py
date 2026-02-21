@@ -1,5 +1,7 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from taxi.models import Driver, Car
@@ -13,7 +15,7 @@ class LicenseNumberValidationMixin(object):
             raise ValidationError("Incorrect license number value")
 
         for char in license_number[:3]:
-            if not char.isalpha() and not char.isupper():
+            if not (char.isalpha() and char.isupper()):
                 raise ValidationError("Incorrect license number value")
 
         for char in license_number[3:]:
@@ -29,7 +31,8 @@ class DriverCreationForm(
 ):
 
     class Meta(UserCreationForm.Meta):
-        model = Driver
+        User = get_user_model()
+        model = User
         fields = UserCreationForm.Meta.fields + ("license_number",)
 
 
@@ -39,14 +42,15 @@ class DriverLicenseUpdateForm(
 ):
 
     class Meta:
-        model = Driver
+        User = get_user_model()
+        model = User
         fields = ("license_number",)
-        exclude = ("password",)
 
 
 class CarCreateForm(forms.ModelForm):
     drivers = forms.ModelMultipleChoiceField(
-        queryset=Driver.objects.all(),
+        User = get_user_model(),
+        queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
